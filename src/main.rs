@@ -7,9 +7,13 @@ use tokio::sync::Mutex;
 use mime_guess::from_path;
 use warp::http::header::HeaderValue;
 use warp::reply::Response;
+use log;
+use env_logger;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     // Scan all in 'files' directory
     let files_dir = Path::new("files");
     let files = fs::read_dir(files_dir)
@@ -23,6 +27,9 @@ async fn main() {
             }
         })
         .collect::<Vec<_>>();
+
+    // Print the list of files
+    log::info!("Files found in 'files' directory: {:?}", files);
 
     if files.is_empty() {
         eprintln!("No files found in the 'files' directory.");
@@ -40,6 +47,9 @@ async fn main() {
             async move {
                 let files = files.lock().await;
                 let file = files.choose(&mut rand::thread_rng()).unwrap();
+
+                // Print the selected file
+                log::info!("Selected file: {:?}", file);
 
                 // Read file contents
                 let content = match fs::read(file) {
@@ -60,6 +70,6 @@ async fn main() {
 
     // Start Web service
     warp::serve(route)
-        .run(([127, 0, 0, 1], 3030))
+        .run(([0, 0, 0, 0], 3030))
         .await;
 }
