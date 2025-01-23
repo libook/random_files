@@ -11,6 +11,7 @@ use log;
 use env_logger;
 use std::collections::HashMap;
 use url;
+use urlencoding::decode;
 
 #[tokio::main]
 async fn main() {
@@ -24,6 +25,8 @@ async fn main() {
     let handle_request = {
         let files_cache = files_cache.clone();
         move |subdir: String, refresh_cache: bool| {
+            log::info!("Handling request for subdirectory: {}", subdir);
+
             let files_cache = files_cache.clone();
             async move {
                 let mut cache = files_cache.lock().await;
@@ -100,10 +103,12 @@ async fn main() {
                 refresh_cache
             }))
         .and_then(move |path: warp::path::Tail, refresh_cache: bool| {
-            let subdir = path.as_str().to_string(); // Get the subdirectory path
+            // Decode the URL-encoded path
+            let decoded_path = decode(path.as_str()).unwrap_or_else(|_| path.as_str().to_string().into());
+            let subdir = decoded_path.to_string(); // 将 Cow<'_, str> 转换为 String
             let handle_request = handle_request.clone();
             async move {
-                handle_request(subdir, refresh_cache).await
+                handle_request(subdir.to_string(), refresh_cache).await
             }
         });
 
