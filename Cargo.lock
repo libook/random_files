@@ -818,13 +818,14 @@ dependencies = [
 
 [[package]]
 name = "random_files"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "env_logger",
  "log",
  "mime_guess",
  "rand",
  "tokio",
+ "url",
  "warp",
 ]
 
