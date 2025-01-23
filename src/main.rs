@@ -110,4 +110,5 @@ async fn main() {
     // Start Web service
     warp::serve(route)
         .run(([0, 0, 0, 0], 3030))
+        .await;
 }
