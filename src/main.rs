@@ -34,6 +34,9 @@ async fn main() {
                 // If refresh_cache is true or cache doesn't contain this subdir, refresh the cache
                 if refresh_cache || !cache.contains_key(&subdir) {
                     let files_dir = Path::new("files").join(&subdir);
+                    if !files_dir.exists() || !files_dir.is_dir() {
+                        return Err(warp::reject::not_found());
+                    }
                     let files = fs::read_dir(&files_dir)
                         .expect("Failed to read files directory")
                         .filter_map(|entry| {
