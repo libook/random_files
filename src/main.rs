@@ -105,7 +105,7 @@ async fn main() {
         .and_then(move |path: warp::path::Tail, refresh_cache: bool| {
             // Decode the URL-encoded path
             let decoded_path = decode(path.as_str()).unwrap_or_else(|_| path.as_str().to_string().into());
-            let subdir = decoded_path.to_string(); // 将 Cow<'_, str> 转换为 String
+            let subdir = decoded_path.to_string();
             let handle_request = handle_request.clone();
             async move {
                 handle_request(subdir.to_string(), refresh_cache).await
