@@ -87,12 +87,15 @@ async fn main() {
         }
     };
 
-    // Route for both root and subdirectories
+    // Route filters
     let route = warp::path::tail()
+        // Process query string
         .and(warp::filters::query::raw()
-            .or_else(|_| async { Ok::<(String,), warp::Rejection>((String::new(),)) }) // Handle empty query string
+            // Handle empty query string
+            .or_else(|_| async { Ok::<(String,), warp::Rejection>((String::new(),)) })
+            // Prepare query parameters
             .map(|query: String| {
-                log::info!("Raw query string: {}", query); // Debug log
+                log::info!("Raw query string: {}", query);
                 // Parse the query string manually
                 let mut refresh_cache = false; // Default to false
                 if !query.is_empty() {
@@ -103,25 +106,28 @@ async fn main() {
                         }
                     }
                 }
-                log::info!("Parsed refresh_cache: {}", refresh_cache); // Debug log
+                log::info!("Parsed refresh_cache: {}", refresh_cache);
                 refresh_cache
             }))
+        // Process path
         .and_then(move |path: warp::path::Tail, refresh_cache: bool| {
             // Decode the URL-encoded path
             let decoded_path = decode(path.as_str()).unwrap_or_else(|_| path.as_str().to_string().into());
             let subdir = decoded_path.to_string();
+
+            // Call handler
             let handle_request = handle_request.clone();
             async move {
                 handle_request(subdir.to_string(), refresh_cache).await
             }
         });
 
-    // Read the port from the environment variable or use the default value
+    // Read environment variables
     let port: u16 = env::var("LISTEN_PORT")
         .map(|p| p.parse().unwrap_or(3030))
         .unwrap_or(3030);
 
-    // Start Web service with the specified port
+    // Bind and serve
     warp::serve(route)
         .run(([0, 0, 0, 0], port))
         .await;
