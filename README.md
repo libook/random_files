@@ -12,6 +12,7 @@ Respond random files in a directory.
 - Support subdirectories. e.g. `http://127.0.0.1:3030/subdir1`
 - Use boolean query `refresh_cache` to refresh the file list cache of a directory. e.g. `http://127.0.0.1:3030/subdir1?refresh_cache=true`
 - Use environment variable `RUST_LOG` to set log level. e.g. `RUST_LOG=info ./random_files`
+- Use environment variable `LISTEN_PORT` to set listen port. e.g. `LISTEN_PORT=3031 ./random_files`
 
 ## Installation
 

@@ -12,6 +12,7 @@ use env_logger;
 use std::collections::HashMap;
 use url;
 use urlencoding::decode;
+use std::env;
 
 #[tokio::main]
 async fn main() {
@@ -115,8 +116,13 @@ async fn main() {
             }
         });
 
-    // Start Web service
+    // Read the port from the environment variable or use the default value
+    let port: u16 = env::var("LISTEN_PORT")
+        .map(|p| p.parse().unwrap_or(3030))
+        .unwrap_or(3030);
+
+    // Start Web service with the specified port
     warp::serve(route)
-        .run(([0, 0, 0, 0], 3030))
+        .run(([0, 0, 0, 0], port))
         .await;
 }
