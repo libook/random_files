@@ -1,18 +1,18 @@
-use warp::Filter;
-use std::path::{Path, PathBuf};
+use std::env;
 use std::fs;
-use rand::seq::SliceRandom;
+use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::collections::HashMap;
 use tokio::sync::Mutex;
+use rand::seq::SliceRandom;
 use mime_guess::from_path;
+use warp::Filter;
 use warp::http::header::HeaderValue;
 use warp::reply::Response;
-use log;
-use env_logger;
-use std::collections::HashMap;
 use url;
 use urlencoding::decode;
-use std::env;
+use log;
+use env_logger;
 
 #[tokio::main]
 async fn main() {
