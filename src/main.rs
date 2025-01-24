@@ -18,6 +18,11 @@ use env_logger;
 async fn main() {
     env_logger::init();
 
+    // Read environment variables
+    let port: u16 = env::var("LISTEN_PORT")
+        .map(|p| p.parse().unwrap_or(3030))
+        .unwrap_or(3030);
+
     // Wrapping file lists in Arc and Mutex for sharing in multi-threaded environments
     // Use a HashMap to cache file lists for different subdirectories
     let files_cache = Arc::new(Mutex::new(HashMap::<String, Vec<PathBuf>>::new()));
@@ -121,11 +126,6 @@ async fn main() {
                 handle_request(subdir.to_string(), refresh_cache).await
             }
         });
-
-    // Read environment variables
-    let port: u16 = env::var("LISTEN_PORT")
-        .map(|p| p.parse().unwrap_or(3030))
-        .unwrap_or(3030);
 
     // Bind and serve
     warp::serve(route)
