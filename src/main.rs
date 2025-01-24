@@ -27,9 +27,8 @@ async fn main() {
     // Use a HashMap to cache file lists for different subdirectories
     let files_cache = Arc::new(Mutex::new(HashMap::<String, Vec<PathBuf>>::new()));
 
-    // Helper function to handle file listing and caching
+    // Request handler
     let handle_request = {
-        let files_cache = files_cache.clone();
         move |subdir: String, refresh_cache: bool| {
             log::info!("Handling request for subdirectory: {}", subdir);
 
@@ -57,15 +56,15 @@ async fn main() {
 
                     log::info!("Files found in '{}' directory: {:?}", files_dir.display(), files);
 
+                    // 404 for empty directories
                     if files.is_empty() {
                         return Err(warp::reject::not_found());
                     }
 
-                    // Update the cache for this subdirectory
+                    // Update the file list cache
                     cache.insert(subdir.clone(), files);
                 }
 
-                // Get the cached files for this subdirectory
                 let files = cache.get(&subdir).unwrap();
 
                 // Select a random file
