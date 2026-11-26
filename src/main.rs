@@ -86,6 +86,28 @@ async fn main() {
                 // Build response
                 let mut response = Response::new(content.into());
                 response.headers_mut().insert("Content-Type", mime_type);
+
+                // Every request must return a freshly chosen random file, so tell
+                // browsers and intermediate caches never to reuse a response.
+                // Cache-Control: RFC 9111, honoured by all modern browsers.
+                // Pragma/Expires: HTTP/1.0 clients and old browsers (e.g. IE6-9).
+                // Surrogate-Control/X-Accel-Expires: CDN and nginx caches.
+                response.headers_mut().insert(
+                    "Cache-Control",
+                    HeaderValue::from_static("no-store, no-cache, must-revalidate, max-age=0, private"),
+                );
+                response.headers_mut().insert("Pragma", HeaderValue::from_static("no-cache"));
+                response.headers_mut().insert(
+                    "Expires",
+                    HeaderValue::from_static("Thu, 01 Jan 1970 00:00:00 GMT"),
+                );
+                response
+                    .headers_mut()
+                    .insert("Surrogate-Control", HeaderValue::from_static("no-store"));
+                response
+                    .headers_mut()
+                    .insert("X-Accel-Expires", HeaderValue::from_static("0"));
+
                 Ok::<_, warp::Rejection>(response)
             }
         }
