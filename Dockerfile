@@ -1,16 +1,12 @@
-# Use Rust official image as builder
-FROM rustlang/rust:nightly-bullseye-slim as builder
+# Use Rust official image as builder, on the same Debian release as the runtime stage
+FROM rust:1-slim-trixie as builder
 WORKDIR /
-
-RUN apt-get update
-RUN apt-get -y install pkg-config libssl-dev
-RUN rustup update
 
 # Copy Cargo files and compile dependencies
 COPY . ./
 RUN cargo build --release
 
-FROM debian:bullseye-slim
+FROM debian:trixie-slim
 RUN apt-get update && apt-get install --no-install-recommends -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*

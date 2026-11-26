@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
-use rand::seq::SliceRandom;
+use rand::seq::IndexedRandom;
 use mime_guess::from_path;
 use warp::Filter;
 use warp::http::header::HeaderValue;
@@ -68,7 +68,7 @@ async fn main() {
                 let files = cache.get(&subdir).unwrap();
 
                 // Select a random file
-                let file = files.choose(&mut rand::thread_rng()).unwrap();
+                let file = files.choose(&mut rand::rng()).unwrap();
 
                 // Print the selected file
                 log::info!("Selected file: {:?}", file);
